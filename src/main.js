@@ -1,17 +1,17 @@
-const electron = require("electron");
-const {app, BrowserWindow} = require('electron'); // to not code 'electron.app' or 'electron.BrowserWindow'
+const {app, BrowserWindow, screen, ipcMain} = require('electron');
 
+let win = null;
 
 function getDisplaySize() {
-    let display = electron.screen.getPrimaryDisplay()
+    const display = screen.getPrimaryDisplay();
     return {width: display.bounds.width, height: display.bounds.height};
 }
 
-const createWindow = () => {
+function createWindow() {
     const windowWidth = 128;
     const windowHeight = 128;
-    const win = new BrowserWindow({
-		width: windowWidth,
+    win = new BrowserWindow({
+        width: windowWidth,
         height: windowHeight,
         transparent: true,
         frame: false,
@@ -19,9 +19,13 @@ const createWindow = () => {
         skipTaskbar: true,
         resizable: false,
         focusable: false,
+        webPreferences: {
+            preload: __dirname + '/preload.js',  // путь к вашему preload.js
+            contextIsolation: true,
+        },
     });
 
-    let displaySize = getDisplaySize();
+    const displaySize = getDisplaySize();
 
     win.setMenu(null);
     win.setPosition(
@@ -29,20 +33,22 @@ const createWindow = () => {
         displaySize.height - windowHeight
     );
     win.loadFile('src/index.html');
-};
+    win.on('closed', () => {
+        win = null;
+    });
+}
 
-app.on('ready', () => {
-    createWindow();
+// IPC: обработка запроса на выход
+ipcMain.on('close-dummy-app', () => {
+    app.quit();
 });
 
-// quit the app when all windows are closed (Win & Linux)
-// https://www.electronjs.org/docs/latest/tutorial/tutorial-first-app#quit-the-app-when-all-windows-are-closed-windows--linux
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
-})
+app.whenReady().then(createWindow);
 
-// open a window if non are open (macOS)
-// https://www.electronjs.org/docs/latest/tutorial/tutorial-first-app#open-a-window-if-none-are-open-macos 
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+});
+
 app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-})
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});

@@ -54,20 +54,30 @@
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const cat = document.getElementById('dummy-cat');
+
             setTimeout(() => {
                 cat.classList.add('visible');
             }, Math.random() * (3000 - 100) + 100);
+
             cat.addEventListener('click', () => {
                 cat.classList.remove('visible');
                 setTimeout(() => {
                     cat.classList.add('visible');
                 }, Math.random() * (3000 - 100) + 100);
             });
-            cat.addEventListener('contextmenu', () => {
+
+            cat.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
                 cat.classList.remove('visible');
-                setTimeout(() => {
-                    cat.classList.add('visible');
-                }, 10000);
+                const onTransitionEnd = (event) => {
+                    if (event.propertyName === 'bottom') {
+                        if (window.electronAPI && window.electronAPI.closeApp) {
+                            window.electronAPI.closeApp();
+                        }
+                        cat.removeEventListener('transitionend', onTransitionEnd);
+                    }
+                };
+                cat.addEventListener('transitionend', onTransitionEnd);
             });
         });
     </script>
