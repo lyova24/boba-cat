@@ -1,4 +1,4 @@
-# boba-cat (v1.0.1)
+# boba-cat
 
 ##### fully vibe-coded cat enjoying some boba on your desktop
 
