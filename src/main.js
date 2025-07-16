@@ -1,4 +1,5 @@
 const {app, BrowserWindow, screen, ipcMain} = require('electron');
+const activeWin = require('active-win');
 
 let win = null;
 
@@ -20,7 +21,7 @@ function createWindow() {
         resizable: false,
         focusable: false,
         webPreferences: {
-            preload: __dirname + '/preload.js',  // путь к вашему preload.js
+            preload: __dirname + '/preload.js',
             contextIsolation: true,
         },
     });
@@ -36,6 +37,32 @@ function createWindow() {
     win.on('closed', () => {
         win = null;
     });
+
+    let lastIDE = false;
+    setInterval(async () => {
+        try {
+            const res = await activeWin();
+            const ideList = [
+                'Code', 'pycharm', 'idea',
+                'webstorm', 'clion', 'goland', 'rustrover'
+            ];
+            const isIDE = !!(
+                res &&
+                ideList.some(n =>
+                    res.owner && res.owner.name && res.owner.name.toLowerCase().includes(n.toLowerCase())
+                )
+            );
+            if (isIDE !== lastIDE) {
+                lastIDE = isIDE;
+                if (win && win.webContents) {
+                    win.webContents.send('ide-mode', isIDE);
+                    console.log('[main] send ide-mode', isIDE);
+                }
+            }
+        } catch (e) {
+            // skip
+        }
+    }, 500); // every 0.5 sec
 }
 
 // IPC: обработка запроса на выход

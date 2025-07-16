@@ -2,85 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        #dummy-cat {
-            position: fixed;
-            left: 50%;
-            bottom: -100vh;
-            transform: translateX(-50%);
-            transition: bottom 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-            z-index: 9999;
-            width: 100vw;
-            max-width: 800px;
-            min-width: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            pointer-events: auto;
-            cursor: pointer;
-
-            user-drag: none;
-            user-select: none;
-            -moz-user-select: none;
-            -webkit-user-drag: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-        }
-
-        #dummy-cat.visible {
-            bottom: 0;
-        }
-
-        #dummy-cat img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: contain;
-        }
-
-        @media (max-width: 600px) {
-            #dummy-cat {
-                max-width: 100vw;
-                min-width: 0;
-            }
-        }
-    </style>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const cat = document.getElementById('dummy-cat');
-
-            setTimeout(() => {
-                cat.classList.add('visible');
-            }, Math.random() * (3000 - 100) + 100);
-
-            cat.addEventListener('click', () => {
-                cat.classList.remove('visible');
-                setTimeout(() => {
-                    cat.classList.add('visible');
-                }, Math.random() * (3000 - 100) + 100);
-            });
-
-            cat.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                cat.classList.remove('visible');
-                const onTransitionEnd = (event) => {
-                    if (event.propertyName === 'bottom') {
-                        if (window.electronAPI && window.electronAPI.closeApp) {
-                            window.electronAPI.closeApp();
-                        }
-                        cat.removeEventListener('transitionend', onTransitionEnd);
-                    }
-                };
-                cat.addEventListener('transitionend', onTransitionEnd);
-            });
-        });
-    </script>
+    <link rel="stylesheet" href="static/index.css">
+    <script src="cat-logic.js"></script>
 </head>
 <body>
 <div id="dummy-cat">
