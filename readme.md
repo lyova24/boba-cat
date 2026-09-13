@@ -18,11 +18,11 @@ and JavaScript; the small native host is written in Rust.
 ## Development
 
 Install the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for
-your operating system. On Debian or Ubuntu, the active-window integration also
-needs:
+your operating system. On Debian or Ubuntu, the Linux integrations also need:
 
 ```shell
-sudo apt-get install libwebkit2gtk-4.1-dev librsvg2-dev patchelf \
+sudo apt-get install libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+  librsvg2-dev patchelf \
   libxcb-ewmh-dev libxcb-randr0-dev libdbus-1-dev pkg-config
 ```
 

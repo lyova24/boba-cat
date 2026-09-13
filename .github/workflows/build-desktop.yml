@@ -15,10 +15,10 @@ jobs:
         include:
           - platform: ubuntu-22.04
             name: linux-x64
-            args: ""
+            args: --bundles deb,rpm
           - platform: ubuntu-22.04-arm
             name: linux-arm64
-            args: ""
+            args: --bundles deb,rpm
           - platform: windows-latest
             name: windows-x64
             args: ""
@@ -36,7 +36,15 @@ jobs:
         if: startsWith(matrix.platform, 'ubuntu-')
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev patchelf libxcb-ewmh-dev libxcb-randr0-dev libdbus-1-dev pkg-config
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libxcb-ewmh-dev \
+            libxcb-randr0-dev \
+            libdbus-1-dev \
+            pkg-config
 
       - uses: actions/setup-node@v6
         with:
@@ -58,5 +66,12 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: boba-cat-${{ matrix.name }}
-          path: src/target/**/release/bundle/**/*
+          # Upload only distributable bundles. Linux CI intentionally skips
+          # AppImage because bundling WebKitGTK makes it roughly 80 MB.
+          path: |
+            src/target/**/release/bundle/**/*.deb
+            src/target/**/release/bundle/**/*.rpm
+            src/target/**/release/bundle/**/*.dmg
+            src/target/**/release/bundle/**/*.msi
+            src/target/**/release/bundle/**/*.exe
           if-no-files-found: error
